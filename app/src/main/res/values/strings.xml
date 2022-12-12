@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Final Project</string>
+    <string name="bookmark_td">Bookmarking the favourite task</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ne_title">Title</string>
+    <string name="ne_add_info">Button for adding extra information</string>
+    <string name="ne_todo_details">To do details</string>
+    <string name="fab_desc">Add a new To Do</string>
+    <string name="ne_buttonText">Location</string>
+    <string name="ne_addButton">Add</string>
+</resources>
