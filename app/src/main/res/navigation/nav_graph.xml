@@ -22,5 +22,9 @@
             app:destination="@id/toDoListFragment"
             app:popUpTo="@id/toDoListFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="entryItem"
+            app:argType="com.petref.finalproject.ToDoData"
+            app:nullable="true" />
     </fragment>
 </navigation>

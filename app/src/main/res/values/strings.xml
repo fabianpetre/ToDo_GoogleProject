@@ -8,5 +8,5 @@
     <string name="ne_todo_details">To do details</string>
     <string name="fab_desc">Add a new To Do</string>
     <string name="ne_buttonText">Location</string>
-    <string name="ne_addButton">Add</string>
+    <string name="ne_addButton">Done</string>
 </resources>

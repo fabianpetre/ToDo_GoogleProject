@@ -1,13 +1,16 @@
 package com.petref.finalproject
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.petref.finalproject.databinding.TodoItemBinding
 
-class ToDoAdapter ( var todo : List<ToDoData>) : RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder>(){
+class ToDoAdapter(
+    private val toDoList: MutableList<ToDoData>,
+    private val listener: (ToDoData) -> Unit) : RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder>(){
 
-    inner class ToDoViewHolder(val binding : TodoItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ToDoViewHolder(val binding : TodoItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -16,18 +19,22 @@ class ToDoAdapter ( var todo : List<ToDoData>) : RecyclerView.Adapter<ToDoAdapte
     }
 
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
+        val item = toDoList[position]
+        item.rv_position = position
         holder.binding.apply {
-            tdTitle.text = todo[position].title
-            tdCategory.text = todo[position].category
-            tdIsDone.isChecked = todo[position].isFinishedChecked
+            tdTitle.text = toDoList[position].title
+            tdCategory.text = toDoList[position].category
+            tdIsDone.isChecked = toDoList[position].isFinishedChecked
             tdButtonFavourite.setImageResource(
-                if(!todo[position].isBookmarkChecked)
+                if(!toDoList[position].isBookmarkChecked)
                 R.drawable.ic_bookmark_empty else R.drawable.ic_bookmark_full)
-            tdDateCreated.text=todo[position].timeStamp
+            tdDateCreated.text=toDoList[position].timeStamp
         }
+        holder.binding.tdTitle.setOnClickListener { listener(item) }
+
     }
 
     override fun getItemCount(): Int {
-        return todo.size
+        return toDoList.size
     }
 }
