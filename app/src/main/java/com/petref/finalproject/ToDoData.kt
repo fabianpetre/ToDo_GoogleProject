@@ -6,8 +6,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class ToDoData (
     var title : String,
-    var category : String,
-    var chosen_category_position : Int,
+    var category_position : Int,
     var rv_position : Int,
     var details : String = "",
     var isBookmarkChecked : Boolean,

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +21,14 @@ class ToDoListFragment : Fragment() {
     private lateinit var binding : FragmentToDoListBinding
     private lateinit var viewModel: ToDoListViewModel
     private lateinit var recyclerView: RecyclerView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(ToDoListViewModel::class.java)
+        viewModel.currentItemsNumber.observe(this,Observer{
+            binding.todolistItemCount.text = it.toString() + " items"
+        })
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentToDoListBinding.inflate(inflater, container, false)
@@ -33,7 +43,7 @@ class ToDoListFragment : Fragment() {
             val action = ToDoListFragmentDirections.actionToDoListFragmentToNewEntryFragment(toDoData)
             Navigation.findNavController(view).navigate(action)
         }
-
+        viewModel.currentItemsNumber.value = toDoList.size
         binding.todolistRecyclerView.adapter = adapter
         binding.todolistRecyclerView.layoutManager = LinearLayoutManager(view.context)
 

@@ -23,7 +23,7 @@ class ToDoAdapter(
         item.rv_position = position
         holder.binding.apply {
             tdTitle.text = toDoList[position].title
-            tdCategory.text = toDoList[position].category
+            tdCategory.text = categories[toDoList[position].category_position]
             tdIsDone.isChecked = toDoList[position].isFinishedChecked
             tdButtonFavourite.setImageResource(
                 if(!toDoList[position].isBookmarkChecked)
