@@ -14,61 +14,52 @@ import com.petref.finalproject.databinding.FragmentNewEntryBinding
 import java.util.*
 
 class NewEntryFragment : Fragment() {
-    var isNewEntry : Boolean = true
-    var categoryChanged = false
-    val args : NewEntryFragmentArgs by navArgs()
+    private var isNewEntry : Boolean = true
+    private var categoryChanged = false
+    private val args : NewEntryFragmentArgs by navArgs()
     private lateinit var binding : FragmentNewEntryBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentNewEntryBinding.inflate(inflater, container, false)
         val bundle = arguments
         /**
-         * Setting up the Entry View if it already has information
+         * Setting up the Entry if already existing
          */
         if (bundle != null) {
             val args = NewEntryFragmentArgs.fromBundle(bundle)
-            if(args.entryItem?.title?.isNotBlank() == true && args.entryItem?.title?.isNotEmpty() == true) {
-
-                isNewEntry = false
-                val entryItem = args.entryItem
-
-                binding.apply {
-                    if (entryItem != null) {
-
-                        neTitle.setText(entryItem.title)
-                        neDetails.setText(entryItem.details)
-                        neTimeCreated.text = entryItem.timeStamp
-                        neCategorySpinner.setText(categories[entryItem.category_position],false)
-                    }
+            val entryItem = args.entryItem
+            if(entryItem != null) { //Checking if the entry item is null
+                if (entryItem.title.isNotBlank() && entryItem.title.isNotEmpty()) {
+                    isNewEntry = false
+                    setEntry(entryItem) // Setting up the existing data in the entry and flagging the entry as already existing
                 }
-            } else {
-
+            }
+            // If item is new, get and display task creation time
+            else {
                 val c = Calendar.getInstance()
                 val timestamp = "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
                 binding.neTimeCreated.text = timestamp
             }
         }
-        // Inflate the layout for this fragment
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var chosenCategoryPosition = 0
+
+        //Getting the time of entering in NewEntryFragment
         val c = Calendar.getInstance()
         val timestamp = "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
 
         val adapter = ToDoAdapter(toDoList){_ ->}
-
         val spinner = binding.neCategorySpinner
         val spinnerAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, categories)
         spinner.setAdapter(spinnerAdapter)
+
         if (isNewEntry) spinner.setText(categories[chosenCategoryPosition], false)
-        spinner.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+
+        spinner.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             chosenCategoryPosition = position
             categoryChanged = true
         }
@@ -76,24 +67,23 @@ class NewEntryFragment : Fragment() {
         binding.neDoneButton.setOnClickListener {
             val title = binding.neTitle.text.toString()
             val details = binding.neDetails.text.toString()
-            if(title.isBlank() || title.isEmpty()){ binding.neTitleHolder.error = "Title can't be empty" }
+            if(title.isBlank() || title.isEmpty()) binding.neTitleHolder.error = "Title can't be empty"
             else {
                 binding.neTitleHolder.error = null
+                // Creating a new ToDoData item or saving changed data
                 if (isNewEntry) {
-
                     val rvPosition = toDoList.size - 1
                     val newToDoEntry = ToDoData(
                         title = title,
                         category_position = chosenCategoryPosition,
                         rv_position = rvPosition,
                         details = details,
-                        false,
-                        false,
-                        timestamp
+                        isBookmarkChecked = false,
+                        isFinishedChecked = false,
+                        timeStamp = timestamp
                     )
                     toDoList.add(newToDoEntry)
                     adapter.notifyItemInserted(rvPosition)
-
                 } else {
                     val rvPosition = args.entryItem!!.rv_position
                     val item = toDoList[rvPosition]
@@ -104,6 +94,14 @@ class NewEntryFragment : Fragment() {
                 findNavController().navigate(R.id.action_newEntryFragment_to_toDoListFragment2)
             }
         }
+    }
 
+    private fun setEntry(entryItem : ToDoData){
+        binding.apply {
+            neTitle.setText(entryItem.title)
+            neDetails.setText(entryItem.details)
+            neTimeCreated.text = entryItem.timeStamp
+            neCategorySpinner.setText(categories[entryItem.category_position],false)
+        }
     }
 }

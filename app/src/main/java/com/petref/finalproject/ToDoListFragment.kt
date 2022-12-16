@@ -17,10 +17,8 @@ import com.petref.finalproject.databinding.FragmentToDoListBinding
 
 class ToDoListFragment : Fragment() {
 
-
     private lateinit var binding : FragmentToDoListBinding
     private lateinit var viewModel: ToDoListViewModel
-    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +36,6 @@ class ToDoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = ToDoAdapter(toDoList){
-
             toDoData ->
             val action = ToDoListFragmentDirections.actionToDoListFragmentToNewEntryFragment(toDoData)
             Navigation.findNavController(view).navigate(action)
@@ -53,8 +50,5 @@ class ToDoListFragment : Fragment() {
             val action = ToDoListFragmentDirections.actionToDoListFragmentToNewEntryFragment(null)
             Navigation.findNavController(view).navigate(action)
         }
-
-        recyclerView = binding.todolistRecyclerView
-
     }
 }

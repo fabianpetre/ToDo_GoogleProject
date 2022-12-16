@@ -21,16 +21,17 @@ class ToDoAdapter(
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
         val item = toDoList[position]
         item.rv_position = position
+
         holder.binding.apply {
             tdTitle.text = toDoList[position].title
             tdCategory.text = categories[toDoList[position].category_position]
             tdIsDone.isChecked = toDoList[position].isFinishedChecked
+            tdDateCreated.text=toDoList[position].timeStamp
             tdButtonFavourite.setImageResource(
                 if(!toDoList[position].isBookmarkChecked)
                 R.drawable.ic_bookmark_empty else R.drawable.ic_bookmark_full)
-            tdDateCreated.text=toDoList[position].timeStamp
         }
-        holder.binding.tdTitle.setOnClickListener { listener(item) }
+        holder.binding.itemViewGroup.setOnClickListener { listener(item) }
 
     }
 
