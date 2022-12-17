@@ -11,20 +11,20 @@
         tools:layout="@layout/fragment_to_do_list" >
         <action
             android:id="@+id/action_toDoListFragment_to_newEntryFragment"
-            app:destination="@id/newEntryFragment" />
+            app:destination="@id/addEditEntryFragment" />
     </fragment>
     <fragment
-        android:id="@+id/newEntryFragment"
-        android:name="com.petref.finalproject.NewEntryFragment"
-        tools:layout="@layout/fragment_new_entry" >
+        android:id="@+id/addEditEntryFragment"
+        android:name="com.petref.finalproject.AddEditEntryFragment"
+        tools:layout="@layout/fragment_addedit_entry" >
         <action
-            android:id="@+id/action_newEntryFragment_to_toDoListFragment2"
+            android:id="@+id/action_newEntryFragment_to_toDoListFragment"
             app:destination="@id/toDoListFragment"
             app:popUpTo="@id/toDoListFragment"
             app:popUpToInclusive="true" />
         <argument
             android:name="entryItem"
-            app:argType="com.petref.finalproject.ToDoData"
+            app:argType="com.petref.finalproject.database.ToDoData"
             app:nullable="true" />
     </fragment>
 </navigation>
