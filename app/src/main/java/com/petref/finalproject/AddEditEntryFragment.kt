@@ -1,12 +1,14 @@
 package com.petref.finalproject
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.petref.finalproject.database.ToDoData
@@ -40,6 +42,23 @@ class AddEditEntryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Setting up Delete Menu
+        if(!isNewEntry) {
+            (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.delete_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    if(menuItem.itemId == R.id.menu_delete){
+                        deleteToDo()
+                        return true
+                    }
+                    return false
+                }
+            }, viewLifecycleOwner)
+        }
 
         //Getting the time of entering in NewEntryFragment
         val timestamp = getSetTime()
@@ -85,6 +104,19 @@ class AddEditEntryFragment : Fragment() {
         }
     }
 
+    private fun deleteToDo() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setPositiveButton("Yes"){ _, _ ->
+            //TODO implement ROOM delete
+            toDoList.remove(args.entryItem)
+            findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
+        }
+        builder.setNegativeButton("No"){ _, _ -> }
+        builder.setTitle("Delete ${args.entryItem?.title}?")
+        builder.setMessage("Are you sure you want to delete this ToDo item?")
+        builder.create().show()
+    }
+
     private fun spinnerSetup() {
         val spinner = binding.neCategorySpinner
         val spinnerAdapter = ArrayAdapter(requireView().context, android.R.layout.simple_spinner_dropdown_item, categories)
@@ -111,4 +143,5 @@ class AddEditEntryFragment : Fragment() {
         val c = Calendar.getInstance()
         return "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
     }
+
 }
