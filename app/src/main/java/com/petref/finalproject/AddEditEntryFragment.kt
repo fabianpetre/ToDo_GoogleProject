@@ -17,6 +17,7 @@ import java.util.*
 class AddEditEntryFragment : Fragment() {
     private var isNewEntry : Boolean = true
     private var categoryChanged = false
+    private var chosenCategoryPosition = 0
     private lateinit var binding : FragmentAddeditEntryBinding
 //    private lateinit var mToDoViewModel : ToDoViewModel
 
@@ -26,53 +27,35 @@ class AddEditEntryFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAddeditEntryBinding.inflate(inflater, container, false)
 //        mToDoViewModel = ViewModelProvider(this).get(ToDoViewModel::class.java)
+
+        //Setting up the Entry if already existing
         val entryItem = args.entryItem
-        /**
-         * Setting up the Entry if already existing
-         */
-        if(entryItem != null) { //Checking if the entry item is null
-            if (entryItem.title.isNotBlank() && entryItem.title.isNotEmpty()) {
-                isNewEntry = false
-                setEntry(entryItem) // Setting up the existing data in the entry and flagging the entry as already existing
-            }
+        if(entryItem != null) {
+            isNewEntry = false
+            setEntry(entryItem) // Setting up the existing data in the entry and flagging the entry as already existing
         }
-        // If item is new, get and display task creation time
-        else {
-            val c = Calendar.getInstance()
-            val timestamp = "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
-            binding.neTimeCreated.text = timestamp
-            }
+        else binding.neTimeCreated.text = getSetTime() // If item is new, get and display task creation time
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var chosenCategoryPosition = 0
 
         //Getting the time of entering in NewEntryFragment
-        val c = Calendar.getInstance()
-        val timestamp = "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
-
-        val adapter = ToDoAdapter(toDoList){_ ->}
+        val timestamp = getSetTime()
 
         // Spinner
-        val spinner = binding.neCategorySpinner
-        val spinnerAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, categories)
-        spinner.setAdapter(spinnerAdapter)
-        if (isNewEntry) spinner.setText(categories[chosenCategoryPosition], false)
-        spinner.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            chosenCategoryPosition = position
-            categoryChanged = true
-        }
+        spinnerSetup()
+
+        val adapter = ToDoAdapter()
 
         binding.neDoneButton.setOnClickListener {
             val title = binding.neTitle.text.toString()
-            val details = binding.neDetails.text.toString()
-
             if(inputCheck(title)) {
                 binding.neTitleHolder.error = null
-                // Creating a new ToDoData item or saving changed data
-                if (isNewEntry) {
+                val details = binding.neDetails.text.toString()
+
+                if (isNewEntry) { // Creating a new ToDoData item or saving changed data
                     val rvPosition = toDoList.size - 1
                     val newToDoEntry = ToDoData(
                         0,
@@ -87,22 +70,33 @@ class AddEditEntryFragment : Fragment() {
                     toDoList.add(newToDoEntry)
 //                    mToDoViewModel.addToDo(newToDoEntry)
                     adapter.notifyItemInserted(rvPosition)
-                } else {
+                }
+                else { // Save changed data
                     val rvPosition = args.entryItem!!.rv_position
                     val item = toDoList[rvPosition]
                     item.title = title
-                    item.details = binding.neDetails.text.toString()
+                    item.details = details
                     if(categoryChanged) item.category_position = chosenCategoryPosition
                 }
-                findNavController().navigate(R.id.action_newEntryFragment_to_toDoListFragment)
+
+                findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
+
             } else binding.neTitleHolder.error = "Title can't be empty"
         }
     }
 
-    private fun inputCheck(title : String): Boolean {
-        return !(title.isBlank() || title.isEmpty())
+    private fun spinnerSetup() {
+        val spinner = binding.neCategorySpinner
+        val spinnerAdapter = ArrayAdapter(requireView().context, android.R.layout.simple_spinner_dropdown_item, categories)
+        spinner.setAdapter(spinnerAdapter)
+        if (isNewEntry) spinner.setText(categories[chosenCategoryPosition], false)
+        spinner.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            chosenCategoryPosition = position
+            categoryChanged = true
+        }
     }
 
+    private fun inputCheck(title : String): Boolean { return !(title.isBlank() || title.isEmpty()) }
 
     private fun setEntry(entryItem : ToDoData){
         binding.apply {
@@ -111,5 +105,10 @@ class AddEditEntryFragment : Fragment() {
             neTimeCreated.text = entryItem.timeStamp
             neCategorySpinner.setText(categories[entryItem.category_position],false)
         }
+    }
+
+    private fun getSetTime() : String {
+        val c = Calendar.getInstance()
+        return "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
     }
 }

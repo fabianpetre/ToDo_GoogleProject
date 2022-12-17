@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class ToDoViewModel (application: Application): AndroidViewModel(application){
 
-    private val readAllData: LiveData<List<ToDoData>>
+    val readAllData: LiveData<List<ToDoData>>
     private val repository : ToDoRepository
 
     init {

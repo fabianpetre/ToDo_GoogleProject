@@ -10,7 +10,7 @@
         android:name="com.petref.finalproject.ToDoListFragment"
         tools:layout="@layout/fragment_to_do_list" >
         <action
-            android:id="@+id/action_toDoListFragment_to_newEntryFragment"
+            android:id="@+id/action_toDoListFragment_to_addEditEntryFragment"
             app:destination="@id/addEditEntryFragment" />
     </fragment>
     <fragment
@@ -18,7 +18,7 @@
         android:name="com.petref.finalproject.AddEditEntryFragment"
         tools:layout="@layout/fragment_addedit_entry" >
         <action
-            android:id="@+id/action_newEntryFragment_to_toDoListFragment"
+            android:id="@+id/action_addEditEntryFragment_to_toDoListFragment"
             app:destination="@id/toDoListFragment"
             app:popUpTo="@id/toDoListFragment"
             app:popUpToInclusive="true" />
