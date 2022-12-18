@@ -1,22 +1,23 @@
 package com.petref.finalproject.database
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDateTime
 
 @Parcelize
 @Entity(tableName = "todo_table")
-data class ToDoData (
+data class ToDoData(
     @PrimaryKey(autoGenerate = true)
-    var id : Int,
-    var title : String,
-    var category_position : Int,
-    var rv_position : Int,
-    var details : String = "",
-    var isBookmarkChecked : Boolean,
-    var isFinishedChecked : Boolean,
-    var timeStamp : String
-    ) : Parcelable
+    @ColumnInfo(name = "id") var id: Int,
+    @ColumnInfo(name = "title") var title: String,
+    @ColumnInfo(name = "category_position") var category_position: Int,
+    @ColumnInfo(name = "details") var details: String = "",
+    @ColumnInfo(name = "is_bookmark_checked") var isBookmarkChecked: Boolean = false,
+    @ColumnInfo(name = "is_finished_checked") var isFinishedChecked: Boolean = false,
+    @ColumnInfo(name = "timestamp") var timeStamp: String
+) : Parcelable
 
 var categories = arrayOf("School", "Work", "Family")

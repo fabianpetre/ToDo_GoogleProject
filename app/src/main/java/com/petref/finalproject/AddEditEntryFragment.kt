@@ -6,14 +6,16 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.petref.finalproject.database.ToDoData
+import com.petref.finalproject.database.ToDoViewModel
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.databinding.FragmentAddeditEntryBinding
+import java.time.LocalDateTime
 import java.util.*
 
 class AddEditEntryFragment : Fragment() {
@@ -21,14 +23,14 @@ class AddEditEntryFragment : Fragment() {
     private var categoryChanged = false
     private var chosenCategoryPosition = 0
     private lateinit var binding : FragmentAddeditEntryBinding
-//    private lateinit var mToDoViewModel : ToDoViewModel
+    private lateinit var mToDoViewModel : ToDoViewModel
 
     private val args by navArgs<AddEditEntryFragmentArgs>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAddeditEntryBinding.inflate(inflater, container, false)
-//        mToDoViewModel = ViewModelProvider(this).get(ToDoViewModel::class.java)
+        mToDoViewModel = ViewModelProvider(this)[ToDoViewModel::class.java]
 
         //Setting up the Entry if already existing
         val entryItem = args.entryItem
@@ -36,15 +38,22 @@ class AddEditEntryFragment : Fragment() {
             isNewEntry = false
             setEntry(entryItem) // Setting up the existing data in the entry and flagging the entry as already existing
         }
-        else binding.neTimeCreated.text = getSetTime() // If item is new, get and display task creation time
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Getting the time of entering in AddEditEntryFragment
+        val timestamp = getTime()
+
+        // Spinner
+        spinnerSetup()
+
         // Setting up Delete Menu
+        // Getting and setting time of new task creation
         if(!isNewEntry) {
+            // Setting up Delete Menu
             (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
                 override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                     menuInflater.inflate(R.menu.delete_menu, menu)
@@ -58,15 +67,11 @@ class AddEditEntryFragment : Fragment() {
                     return false
                 }
             }, viewLifecycleOwner)
+
+            // Getting and setting time of new task creation
+        } else {
+            binding.neTimeCreated.text = setTimeString(timestamp, true)
         }
-
-        //Getting the time of entering in NewEntryFragment
-        val timestamp = getSetTime()
-
-        // Spinner
-        spinnerSetup()
-
-        val adapter = ToDoAdapter()
 
         binding.neDoneButton.setOnClickListener {
             val title = binding.neTitle.text.toString()
@@ -75,27 +80,33 @@ class AddEditEntryFragment : Fragment() {
                 val details = binding.neDetails.text.toString()
 
                 if (isNewEntry) { // Creating a new ToDoData item or saving changed data
-                    val rvPosition = toDoList.size - 1
                     val newToDoEntry = ToDoData(
                         0,
                         title = title,
                         category_position = chosenCategoryPosition,
-                        rv_position = rvPosition,
                         details = details,
                         isBookmarkChecked = false,
                         isFinishedChecked = false,
-                        timeStamp = timestamp
+                        timeStamp = setTimeString(timestamp, false)
                     )
-                    toDoList.add(newToDoEntry)
-//                    mToDoViewModel.addToDo(newToDoEntry)
-                    adapter.notifyItemInserted(rvPosition)
+                    mToDoViewModel.addToDo(newToDoEntry)
                 }
                 else { // Save changed data
-                    val rvPosition = args.entryItem!!.rv_position
-                    val item = toDoList[rvPosition]
-                    item.title = title
-                    item.details = details
-                    if(categoryChanged) item.category_position = chosenCategoryPosition
+                    val entryItem = args.entryItem
+                    if (entryItem != null) {
+                        var categoryPosition = entryItem.category_position
+                        if (categoryChanged) categoryPosition = chosenCategoryPosition
+                        val updatedUser = ToDoData(
+                            id = entryItem.id,
+                            title = title,
+                            category_position = categoryPosition,
+                            details = details,
+                            isBookmarkChecked = entryItem.isBookmarkChecked,
+                            isFinishedChecked = entryItem.isFinishedChecked,
+                            timeStamp = entryItem.timeStamp
+                        )
+                        mToDoViewModel.updateToDo(updatedUser)
+                    }
                 }
 
                 findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
@@ -107,8 +118,8 @@ class AddEditEntryFragment : Fragment() {
     private fun deleteToDo() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes"){ _, _ ->
-            //TODO implement ROOM delete
-            toDoList.remove(args.entryItem)
+                if(args.entryItem != null)
+                mToDoViewModel.deleteToDo(args.entryItem!!)
             findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
         }
         builder.setNegativeButton("No"){ _, _ -> }
@@ -130,6 +141,7 @@ class AddEditEntryFragment : Fragment() {
 
     private fun inputCheck(title : String): Boolean { return !(title.isBlank() || title.isEmpty()) }
 
+    // Sets up the entry with already existing data
     private fun setEntry(entryItem : ToDoData){
         binding.apply {
             neTitle.setText(entryItem.title)
@@ -139,9 +151,25 @@ class AddEditEntryFragment : Fragment() {
         }
     }
 
-    private fun getSetTime() : String {
-        val c = Calendar.getInstance()
-        return "${c.get(Calendar.DAY_OF_MONTH)} at ${c.get(Calendar.HOUR_OF_DAY)}:${c.get(Calendar.MINUTE)}"
+    private fun setTimeString(timeStamp: LocalDateTime, isNew : Boolean): String {
+        if (isNew)
+            return "Today at ${timeStamp.hour}:${timeStamp.minute}"
+        return "${timeStamp.dayOfMonth} ${timeStamp.month} at ${timeStamp.hour}:${timeStamp.minute}"
     }
+
+    // Gets and sets current time by format
+    private fun getTime() : LocalDateTime {
+        val calendar = Calendar.getInstance()
+        val currentTimeStamp = LocalDateTime.of(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            calendar.get(Calendar.SECOND)
+        )
+        return currentTimeStamp
+    }
+
 
 }

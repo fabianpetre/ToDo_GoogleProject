@@ -3,6 +3,7 @@ package com.petref.finalproject.database
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,6 +11,9 @@ import kotlinx.coroutines.launch
 class ToDoViewModel (application: Application): AndroidViewModel(application){
 
     val readAllData: LiveData<List<ToDoData>>
+    val itemsCount: MutableLiveData<Int> by lazy{
+        MutableLiveData<Int>()
+    }
     private val repository : ToDoRepository
 
     init {
@@ -21,6 +25,18 @@ class ToDoViewModel (application: Application): AndroidViewModel(application){
     fun addToDo(todo : ToDoData){
         viewModelScope.launch (Dispatchers.IO){
             repository.addToDo(todo)
+        }
+    }
+
+    fun updateToDo(todo : ToDoData){
+        viewModelScope.launch (Dispatchers.IO){
+            repository.updateToDo(todo)
+        }
+    }
+
+    fun deleteToDo(todo : ToDoData){
+        viewModelScope.launch (Dispatchers.IO){
+            repository.deleteToDo(todo)
         }
     }
 
