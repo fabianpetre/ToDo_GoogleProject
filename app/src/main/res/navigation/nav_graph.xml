@@ -3,28 +3,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/toDoListFragment">
+    app:startDestination="@+id/nav_home">
 
     <fragment
-        android:id="@+id/toDoListFragment"
+        android:id="@+id/nav_home"
         android:name="com.petref.finalproject.ToDoListFragment"
         tools:layout="@layout/fragment_to_do_list" >
         <action
             android:id="@+id/action_toDoListFragment_to_addEditEntryFragment"
             app:destination="@id/addEditEntryFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/addEditEntryFragment"
         android:name="com.petref.finalproject.AddEditEntryFragment"
         tools:layout="@layout/fragment_addedit_entry" >
         <action
             android:id="@+id/action_addEditEntryFragment_to_toDoListFragment"
-            app:destination="@id/toDoListFragment"
-            app:popUpTo="@id/toDoListFragment"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_home"
             app:popUpToInclusive="true" />
         <argument
             android:name="entryItem"
             app:argType="com.petref.finalproject.database.ToDoData"
             app:nullable="true" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_aboutus"
+        android:name="com.petref.finalproject.aboutus.AboutUsFragment"
+        android:label="fragment_aboutus"
+        tools:layout="@layout/fragment_aboutus" />
+    <fragment
+        android:id="@+id/nav_contact"
+        android:name="com.petref.finalproject.contact.ContactFragment"
+        android:label="fragment_contact"
+        tools:layout="@layout/fragment_contact" />
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="com.petref.finalproject.share.ShareFragment"
+        android:label="fragment_share"
+        tools:layout="@layout/fragment_share" />
 </navigation>

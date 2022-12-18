@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.petref.finalproject.database.ToDoData
-import com.petref.finalproject.database.ToDoViewModel
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.databinding.FragmentAddeditEntryBinding
 import java.time.LocalDateTime
@@ -26,7 +25,6 @@ class AddEditEntryFragment : Fragment() {
     private lateinit var mToDoViewModel : ToDoViewModel
 
     private val args by navArgs<AddEditEntryFragmentArgs>()
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAddeditEntryBinding.inflate(inflater, container, false)
@@ -118,8 +116,7 @@ class AddEditEntryFragment : Fragment() {
     private fun deleteToDo() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes"){ _, _ ->
-                if(args.entryItem != null)
-                mToDoViewModel.deleteToDo(args.entryItem!!)
+            if(args.entryItem != null) mToDoViewModel.deleteToDo(args.entryItem!!)
             findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
         }
         builder.setNegativeButton("No"){ _, _ -> }
@@ -150,11 +147,23 @@ class AddEditEntryFragment : Fragment() {
             neCategorySpinner.setText(categories[entryItem.category_position],false)
         }
     }
-
+    // Setting / formatting the time to String
     private fun setTimeString(timeStamp: LocalDateTime, isNew : Boolean): String {
-        if (isNew)
-            return "Today at ${timeStamp.hour}:${timeStamp.minute}"
-        return "${timeStamp.dayOfMonth} ${timeStamp.month} at ${timeStamp.hour}:${timeStamp.minute}"
+
+        // Hours and minutes can look like 9:2 instead of 09:02 so we're formatting them right
+        val minutes : String = if(timeStamp.minute<10) "0${timeStamp.minute}"
+        else timeStamp.minute.toString()
+
+        val hours : String = if(timeStamp.hour<10) "0${timeStamp.hour}"
+        else timeStamp.hour.toString()
+
+        // Formatting the month DECEMBER -> Dec
+        val month = timeStamp.month.toString().lowercase().substring(0,3).replaceFirstChar{ it.uppercase() }
+
+        // When creating a new item, will show "Today at 12:22" and in DB the full time will be saved
+        if (isNew) return "Today at ${timeStamp.hour}:$minutes"
+
+        return "${timeStamp.dayOfMonth} $month at $hours:$minutes"
     }
 
     // Gets and sets current time by format

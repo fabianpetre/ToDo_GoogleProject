@@ -1,13 +1,10 @@
 package com.petref.finalproject
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.petref.finalproject.database.ToDoData
-import com.petref.finalproject.database.ToDoViewModel
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.databinding.TodoItemBinding
 
