@@ -29,7 +29,7 @@ class ToDoAdapter(private var mToDoViewModel : ToDoViewModel): RecyclerView.Adap
             tdTitle.text = currentItem.title
             tdCategory.text = categories[currentItem.category_position]
             tdIsDone.isChecked = currentItem.isFinishedChecked
-            tdDateCreated.text=currentItem.timeStamp
+            tdTaskDate.text=currentItem.timeCreated
             tdButtonFavourite.setImageResource(
                 if(!currentItem.isBookmarkChecked)
                 R.drawable.ic_bookmark_empty else R.drawable.ic_bookmark_full)
@@ -50,7 +50,9 @@ class ToDoAdapter(private var mToDoViewModel : ToDoViewModel): RecyclerView.Adap
                 details = currentItem.details,
                 isBookmarkChecked = !currentItem.isBookmarkChecked,
                 isFinishedChecked = currentItem.isFinishedChecked,
-                timeStamp = currentItem.timeStamp
+                taskDate = currentItem.taskDate,
+                taskTime = currentItem.taskTime,
+                timeCreated = currentItem.timeCreated
             )
             mToDoViewModel.updateToDo(updatedItem)
         }
@@ -64,7 +66,9 @@ class ToDoAdapter(private var mToDoViewModel : ToDoViewModel): RecyclerView.Adap
                 details = currentItem.details,
                 isBookmarkChecked = currentItem.isBookmarkChecked,
                 isFinishedChecked = !currentItem.isFinishedChecked,
-                timeStamp = currentItem.timeStamp
+                taskDate = currentItem.taskDate,
+                taskTime = currentItem.taskTime,
+                timeCreated = currentItem.timeCreated
             )
             mToDoViewModel.updateToDo(updatedItem)
         }

@@ -1,11 +1,18 @@
 package com.petref.finalproject
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.DatePicker
+import android.widget.TimePicker
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.ViewModelProvider
@@ -17,13 +24,13 @@ import com.petref.finalproject.databinding.FragmentAddeditEntryBinding
 import java.time.LocalDateTime
 import java.util.*
 
-class AddEditEntryFragment : Fragment() {
+class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private var isNewEntry : Boolean = true
     private var categoryChanged = false
     private var chosenCategoryPosition = 0
     private lateinit var binding : FragmentAddeditEntryBinding
     private lateinit var mToDoViewModel : ToDoViewModel
-
+    private val calendar = Calendar.getInstance()
     private val args by navArgs<AddEditEntryFragmentArgs>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -44,7 +51,6 @@ class AddEditEntryFragment : Fragment() {
 
         //Getting the time of entering in AddEditEntryFragment
         val timestamp = getTime()
-
         // Spinner
         spinnerSetup()
 
@@ -65,18 +71,41 @@ class AddEditEntryFragment : Fragment() {
                     return false
                 }
             }, viewLifecycleOwner)
-
-            // Getting and setting time of new task creation
-        } else {
-            binding.neTimeCreated.text = setTimeString(timestamp, true)
         }
 
+        binding.neDateTimeChecker.setOnClickListener {
+            setupVisibilityConstraints()
+        }
+
+        binding.neTaskDate.setOnClickListener {
+            DatePickerDialog(
+                requireContext(),
+                this,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+        //
+        binding.neTaskTime.setOnClickListener {
+            TimePickerDialog(requireContext(),
+                this,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+            ).show()
+        }
+
+        // Submitting the entered values to the DB
         binding.neDoneButton.setOnClickListener {
             val title = binding.neTitle.text.toString()
             if(inputCheck(title)) {
                 binding.neTitleHolder.error = null
                 val details = binding.neDetails.text.toString()
-
+                val taskTime = binding.neTaskTime.text.toString()
+                val taskDate = binding.neTaskDate.text.toString()
+                Log.d("Debugging", "Item, tt: $taskTime, td: $taskDate")
+                val timeCreated = setTimeString(timestamp, false)
                 if (isNewEntry) { // Creating a new ToDoData item or saving changed data
                     val newToDoEntry = ToDoData(
                         0,
@@ -85,7 +114,9 @@ class AddEditEntryFragment : Fragment() {
                         details = details,
                         isBookmarkChecked = false,
                         isFinishedChecked = false,
-                        timeStamp = setTimeString(timestamp, false)
+                        taskDate = taskDate,
+                        taskTime = taskTime,
+                        timeCreated = timeCreated
                     )
                     mToDoViewModel.addToDo(newToDoEntry)
                 }
@@ -101,7 +132,9 @@ class AddEditEntryFragment : Fragment() {
                             details = details,
                             isBookmarkChecked = entryItem.isBookmarkChecked,
                             isFinishedChecked = entryItem.isFinishedChecked,
-                            timeStamp = entryItem.timeStamp
+                            taskTime = taskTime,
+                            taskDate = taskDate,
+                            timeCreated = entryItem.timeCreated
                         )
                         mToDoViewModel.updateToDo(updatedUser)
                     }
@@ -111,6 +144,20 @@ class AddEditEntryFragment : Fragment() {
 
             } else binding.neTitleHolder.error = "Title can't be empty"
         }
+    }
+
+    // Setups the Task Date and Task Time
+    private fun setupVisibilityConstraints() {
+//        binding.neTaskDate.isEnabled = !(binding.neTaskDate.isEnabled)
+        binding.neTaskTime.paintFlags = binding.neTaskTime.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.neTaskDate.paintFlags = binding.neTaskDate.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.neDateTimeChecker.visibility = View.GONE
+        binding.neTaskDate.text = "Task Date"
+        binding.neTaskTime.text = "Task Time"
+        binding.neTaskDate.visibility = View.VISIBLE
+        binding.neTaskTime.visibility = View.VISIBLE
+        val params = binding.neAddLocationButton.layoutParams as ConstraintLayout.LayoutParams
+        params.topToBottom = binding.neTaskDate.id
     }
 
     private fun deleteToDo() {
@@ -140,13 +187,17 @@ class AddEditEntryFragment : Fragment() {
 
     // Sets up the entry with already existing data
     private fun setEntry(entryItem : ToDoData){
+        if(!entryItem.taskDate.isNullOrBlank())
+            setupVisibilityConstraints()
         binding.apply {
             neTitle.setText(entryItem.title)
             neDetails.setText(entryItem.details)
-            neTimeCreated.text = entryItem.timeStamp
+            neTaskTime.text = entryItem.taskTime
+            neTaskDate.text = entryItem.taskDate
             neCategorySpinner.setText(categories[entryItem.category_position],false)
         }
     }
+
     // Setting / formatting the time to String
     private fun setTimeString(timeStamp: LocalDateTime, isNew : Boolean): String {
 
@@ -168,7 +219,6 @@ class AddEditEntryFragment : Fragment() {
 
     // Gets and sets current time by format
     private fun getTime() : LocalDateTime {
-        val calendar = Calendar.getInstance()
         val currentTimeStamp = LocalDateTime.of(
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -180,5 +230,40 @@ class AddEditEntryFragment : Fragment() {
         return currentTimeStamp
     }
 
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        val monthFormatted = when(month+1){
+            1 -> "January"
+            2 -> "February"
+            3 -> "March"
+            4 -> "April"
+            5 -> "May"
+            6 -> "June"
+            7 -> "July"
+            8 -> "August"
+            9 -> "September"
+            10 -> "October"
+            11 -> "November"
+            else -> "December"
+        }
+        binding.neTaskDate.text = "on $dayOfMonth $monthFormatted $year"
+    }
 
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        val ampm : String
+        val formattedHours : String
+        if (hourOfDay>12){
+            val tempHours = hourOfDay-12
+            formattedHours = if(tempHours>9) "$tempHours" else "0$tempHours"
+            ampm = "PM"
+        }else if(hourOfDay==12) {
+            formattedHours = "12"
+            ampm = "PM"
+        }
+        else {
+            formattedHours = if(hourOfDay>9) "$hourOfDay" else "0$hourOfDay"
+            ampm = "AM"
+        }
+        val formattedMinutes = if(minute<10) "0$minute" else minute
+        binding.neTaskTime.text = "at $formattedHours:$formattedMinutes $ampm"
+    }
 }
