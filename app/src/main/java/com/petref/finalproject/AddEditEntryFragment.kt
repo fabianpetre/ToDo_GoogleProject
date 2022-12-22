@@ -1,13 +1,13 @@
 package com.petref.finalproject
 
+import android.R.attr.apiKey
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
@@ -15,14 +15,17 @@ import android.widget.TimePicker
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.libraries.places.api.Places
 import com.petref.finalproject.database.ToDoData
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.databinding.FragmentAddeditEntryBinding
 import java.time.LocalDateTime
 import java.util.*
+
 
 class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private var isNewEntry : Boolean = true
@@ -32,6 +35,17 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
     private lateinit var mToDoViewModel : ToDoViewModel
     private val calendar = Calendar.getInstance()
     private val args by navArgs<AddEditEntryFragmentArgs>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Initialize the SDK
+        Places.initialize(requireContext(), "AIzaSyAmohVoRM1nTks41vJVFZ5QPBS1abVKb")
+
+        // Create a new PlacesClient instance
+        val placesClient = Places.createClient(requireContext())
+
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAddeditEntryBinding.inflate(inflater, container, false)
@@ -104,8 +118,7 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
                 val details = binding.neDetails.text.toString()
                 val taskTime = binding.neTaskTime.text.toString()
                 val taskDate = binding.neTaskDate.text.toString()
-                Log.d("Debugging", "Item, tt: $taskTime, td: $taskDate")
-                val timeCreated = setTimeString(timestamp, false)
+                val timeCreated = setTimeString(timestamp)
                 if (isNewEntry) { // Creating a new ToDoData item or saving changed data
                     val newToDoEntry = ToDoData(
                         0,
@@ -146,6 +159,7 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
         }
     }
 
+
     // Setups the Task Date and Task Time
     private fun setupVisibilityConstraints() {
 //        binding.neTaskDate.isEnabled = !(binding.neTaskDate.isEnabled)
@@ -167,8 +181,8 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
             findNavController().navigate(R.id.action_addEditEntryFragment_to_toDoListFragment)
         }
         builder.setNegativeButton("No"){ _, _ -> }
-        builder.setTitle("Delete ${args.entryItem?.title}?")
-        builder.setMessage("Are you sure you want to delete this ToDo item?")
+        builder.setTitle("Delete \"${args.entryItem?.title}?\"")
+        builder.setMessage("Are you sure you want to delete this item?")
         builder.create().show()
     }
 
@@ -199,7 +213,7 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
     }
 
     // Setting / formatting the time to String
-    private fun setTimeString(timeStamp: LocalDateTime, isNew : Boolean): String {
+    private fun setTimeString(timeStamp: LocalDateTime): String {
 
         // Hours and minutes can look like 9:2 instead of 09:02 so we're formatting them right
         val minutes : String = if(timeStamp.minute<10) "0${timeStamp.minute}"
@@ -212,7 +226,7 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
         val month = timeStamp.month.toString().lowercase().substring(0,3).replaceFirstChar{ it.uppercase() }
 
         // When creating a new item, will show "Today at 12:22" and in DB the full time will be saved
-        if (isNew) return "Today at ${timeStamp.hour}:$minutes"
+//        if (isNew) return "Today at ${timeStamp.hour}:$minutes"
 
         return "${timeStamp.dayOfMonth} $month at $hours:$minutes"
     }

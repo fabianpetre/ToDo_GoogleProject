@@ -11,4 +11,11 @@
     <string name="ne_addButton">Done</string>
     <string name="ne_itemCount">%s items</string>
     <string name="ne_timeCreated">Today at %s1:%s2</string>
+    <string name="title_todolist">All To-Do\'s</string>
+    <string name="sharefr_title">Share</string>
+    <string name="contactfr_title">Contact</string>
+    <string name="aboutusfr_title">About us</string>
+    <string name="navigation_header_desc">Navigation Header</string>
+    <string name="addeditfr_datetime_enabler">Tap to enable date and time</string>
+    <string name="settingsfr_title">Settings</string>
 </resources>

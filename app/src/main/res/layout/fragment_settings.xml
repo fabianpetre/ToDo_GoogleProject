@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".settings.SettingsFragment"
+    android:paddingHorizontal="32dp"
+    android:paddingVertical="16dp">
+
+    <TextView
+        android:id="@+id/tv_app_languages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingVertical="14dp"
+        android:text="App language:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--Spinner for the category-->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tv_languages"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:endIconDrawable="@drawable/ic_arrow_down"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tv_app_languages">
+
+        <AutoCompleteTextView
+            android:id="@+id/languages_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:text="Languages" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tv_app_theme"
+        android:layout_marginVertical="34dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_languages"
+        android:text="Theme"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_app_theme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tv_app_theme"
+        app:layout_constraintTop_toTopOf="@id/tv_app_theme"
+        android:text="Force Dark Theme" />
+
+    <TextView
+        android:id="@+id/tv_map_mode"
+        android:layout_marginVertical="44dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_theme"
+        android:text="Map mode"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_map_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tv_map_mode"
+        app:layout_constraintTop_toTopOf="@id/tv_map_mode"
+        android:text="Normal / Satellite" />
+
+    <TextView
+        android:id="@+id/tv_map_scale"
+        android:layout_marginVertical="44dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_map_mode"
+        android:text="Map scale"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switch_map_scale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tv_map_scale"
+        app:layout_constraintTop_toTopOf="@id/tv_map_scale"
+        android:text="Show Map Scale" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Have you faced any difficulties using our application? \nPlease send us your feedback!"
+        app:layout_constraintBottom_toTopOf="@id/btn_send_feedback"
+        android:layout_marginVertical="10dp"
+        android:paddingHorizontal="10dp"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_send_feedback"
+        android:background="@drawable/shape_item"
+        android:backgroundTint="?attr/colorAccent"
+        android:textColor="@color/darker_gray"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send feedback"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

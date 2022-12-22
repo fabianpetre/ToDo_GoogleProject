@@ -23,3 +23,4 @@ data class ToDoData(
 ) : Parcelable
 
 var categories = arrayOf("Day-to-Day", "School", "Work", "Family","Hobbies")
+var languages = arrayOf("English", "Deutsch")

@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Abschlussprojekt</string>
+    <string name="bookmark_td">Lesezeichen für die bevorzugte Aufgabe</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ne_title">Titel</string>
+    <string name="ne_add_info">Schaltfläche zum Hinzufügen zusätzlicher Informationen</string>
+    <string name="ne_todo_details">Zu erledigende Details</string>
+    <string name="fab_desc">Eine neue Aufgabe hinzufügen</string>
+    <string name="ne_buttonText">Standort</string>
+    <string name="ne_addButton">Erledigt</string>
+    <string name="ne_itemCount">%s artikel</string>
+    <string name="ne_timeCreated">Heute bei %s1:%s2</string>
+    <string name="title_todolist">Alles zu tun</string>
+    <string name="sharefr_title">Aktie</string>
+    <string name="contactfr_title">Kontakt</string>
+    <string name="aboutusfr_title">Uber uns</string>
+    <string name="settingsfr_title">Einstellungen</string>
+    <string name="navigation_header_desc">Navigationskopf</string>
+    <string name="addeditfr_datetime_enabler">Datum und Uhrzeit einschalten</string>
+</resources>
