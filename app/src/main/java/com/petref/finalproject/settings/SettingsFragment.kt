@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CompoundButton
+import androidx.appcompat.app.AppCompatDelegate
 import com.petref.finalproject.R
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.database.languages
@@ -29,18 +31,12 @@ class SettingsFragment : Fragment() {
         val langSpinner = binding.languagesSpinner
         val spinnerAdapter = ArrayAdapter(requireView().context, android.R.layout.simple_spinner_dropdown_item, languages)
         langSpinner.setAdapter(spinnerAdapter)
-        langSpinner.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
-            val selectedLanguage = categories[position]
-            when(selectedLanguage){
-                "English" -> setLocale("en")
-                else -> setLocale("de")
-            }
+
+        binding.switchAppTheme.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }
 
-    private fun setLocale(language: String) {
-        val resources = resources
-        val metrics = resources.displayMetrics
-        val configuration = resources.configuration
-    }
 }

@@ -52,7 +52,8 @@ class ToDoAdapter(private var mToDoViewModel : ToDoViewModel): RecyclerView.Adap
                 isFinishedChecked = currentItem.isFinishedChecked,
                 taskDate = currentItem.taskDate,
                 taskTime = currentItem.taskTime,
-                timeCreated = currentItem.timeCreated
+                timeCreated = currentItem.timeCreated,
+                taskLocation = currentItem.taskLocation
             )
             mToDoViewModel.updateToDo(updatedItem)
         }
@@ -68,7 +69,8 @@ class ToDoAdapter(private var mToDoViewModel : ToDoViewModel): RecyclerView.Adap
                 isFinishedChecked = !currentItem.isFinishedChecked,
                 taskDate = currentItem.taskDate,
                 taskTime = currentItem.taskTime,
-                timeCreated = currentItem.timeCreated
+                timeCreated = currentItem.timeCreated,
+                taskLocation = currentItem.taskLocation
             )
             mToDoViewModel.updateToDo(updatedItem)
         }

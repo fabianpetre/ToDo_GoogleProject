@@ -4,22 +4,31 @@ import android.R.attr.apiKey
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.petref.finalproject.database.ToDoData
 import com.petref.finalproject.database.categories
 import com.petref.finalproject.databinding.FragmentAddeditEntryBinding
@@ -38,12 +47,8 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Initialize the SDK
-        Places.initialize(requireContext(), "AIzaSyAmohVoRM1nTks41vJVFZ5QPBS1abVKb")
-
-        // Create a new PlacesClient instance
-        val placesClient = Places.createClient(requireContext())
+        Places.initialize(requireContext(), BuildConfig.MAPS_API_KEY)
 
     }
 
@@ -57,6 +62,7 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
             isNewEntry = false
             setEntry(entryItem) // Setting up the existing data in the entry and flagging the entry as already existing
         }
+
         return binding.root
     }
 
@@ -65,8 +71,12 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
 
         //Getting the time of entering in AddEditEntryFragment
         val timestamp = getTime()
+        var taskLocation : String? = null
         // Spinner
         spinnerSetup()
+
+        //Setting up the Auto Complete Places Widget
+        autocompleteSetup()
 
         // Setting up Delete Menu
         // Getting and setting time of new task creation
@@ -110,6 +120,13 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
             ).show()
         }
 
+        binding.neAddLocationButton.setOnClickListener {
+            binding.autocompleteFragment.visibility = View.VISIBLE
+            val params = binding.neTitleHolder.layoutParams as ConstraintLayout.LayoutParams
+            params.topToTop = ConstraintSet.UNSET
+            params.topToBottom = binding.autocompleteFragment.id
+        }
+
         // Submitting the entered values to the DB
         binding.neDoneButton.setOnClickListener {
             val title = binding.neTitle.text.toString()
@@ -129,7 +146,8 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
                         isFinishedChecked = false,
                         taskDate = taskDate,
                         taskTime = taskTime,
-                        timeCreated = timeCreated
+                        timeCreated = timeCreated,
+                        taskLocation = taskLocation
                     )
                     mToDoViewModel.addToDo(newToDoEntry)
                 }
@@ -147,7 +165,8 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
                             isFinishedChecked = entryItem.isFinishedChecked,
                             taskTime = taskTime,
                             taskDate = taskDate,
-                            timeCreated = entryItem.timeCreated
+                            timeCreated = entryItem.timeCreated,
+                            taskLocation = entryItem.taskLocation
                         )
                         mToDoViewModel.updateToDo(updatedUser)
                     }
@@ -157,8 +176,38 @@ class AddEditEntryFragment : Fragment(), DatePickerDialog.OnDateSetListener, Tim
 
             } else binding.neTitleHolder.error = "Title can't be empty"
         }
+
     }
 
+    private fun autocompleteSetup() {
+        val autocompleteFragment = childFragmentManager.findFragmentById(R.id.autocomplete_fragment)
+                as AutocompleteSupportFragment
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+                // TODO: Get info about the selected place.
+                Log.d("Debugging", "Place: ${place.name}, ${place.latLng}")
+                val params = binding.neTitleHolder.layoutParams as ConstraintLayout.LayoutParams
+                params.topToBottom = ConstraintSet.UNSET
+                params.topToTop = ConstraintSet.PARENT_ID
+                binding.autocompleteFragment.visibility = View.GONE
+                binding.neAddLocationButton.setCompoundDrawablesWithIntrinsicBounds(0,  0, R.drawable.ic_edit, 0)
+                val latLng = place.latLng.toString().split(",")
+                val lat = latLng[0]
+                val lgt = latLng[1]
+                Log.d("Debugging", "Lat: $lat, Log: $lgt")
+            }
+
+            override fun onError(status: Status) {
+                // TODO: Handle the error.
+                Log.d("Debugging", "An error occurred: $status")
+            }
+        })
+    }
 
     // Setups the Task Date and Task Time
     private fun setupVisibilityConstraints() {

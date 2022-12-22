@@ -19,7 +19,8 @@ data class ToDoData(
     @ColumnInfo(name = "is_finished_checked") var isFinishedChecked: Boolean = false,
     @ColumnInfo(name = "time_created") var timeCreated: String,
     @ColumnInfo(name = "task_date") var taskDate: String?,
-    @ColumnInfo(name = "task_time") var taskTime: String?
+    @ColumnInfo(name = "task_time") var taskTime: String?,
+    @ColumnInfo(name = "task_location") var taskLocation: String?
 ) : Parcelable
 
 var categories = arrayOf("Day-to-Day", "School", "Work", "Family","Hobbies")
